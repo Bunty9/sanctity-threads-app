@@ -1,0 +1,96 @@
+Project Requirement Document
+Project Name: Treads
+Overview:
+Treads is a social media application where users can post textual content, each piece of content being a thread. 
+Users can comment on these threads, with the feature of nested commenting. 
+Each comment itself will also be a thread. 
+Users will be able to log in with either username/password or Google sign-in, handled by Firebase.
+
+Detailed Requirements:
+1. User Authentication:
+Users should be able to register and log in to the application using a username/password combination or Google sign-in.
+Firebase will be used for handling user authentication.
+User data should be stored securely in MongoDB.
+2. Thread Posting:
+Authenticated users should be able to post textual content, each piece of content being a thread.
+Each thread should be visible to all users of the application.
+When a user posts a thread, a notification should be sent to all users who follow the poster.
+3. Commenting:
+Users should be able to comment on threads.
+The commenting system should support nested comments, i.e., users should be able to comment on comments.
+Each comment itself will be a thread.
+4. Notifications:
+Notifications should be sent to users when a user they follow posts a new thread.
+Notifications should also be sent for comments on the user's threads.
+The notification should link to the relevant thread.
+The notification system should be implemented using webhooks for real-time updates.
+5. User Profiles:
+Users should be able to view other users' profiles.
+Users should be able to follow other users. Once followed, they will be subscribed to the activity notifications for the user.
+6. Data Storage:
+All data should be stored in MongoDB.
+Data integrity should be ensured with data validation using Zod.
+7. User Interface:
+The application should have a user-friendly interface for posting threads, commenting, and viewing notifications.
+React Hook Form should be used for efficient management of forms and user input.
+8. Security:
+Middleware, API actions, and authorization should be used for robust application security.
+Technical Stack:
+Frontend: React.js, Next.js, TypeScript
+Backend: Node.js, Express.js
+Database: MongoDB
+Authentication: Firebase
+Real-time updates: Webhooks
+Data Validation: Zod
+Form Management: React Hook Form
+Milestones:
+Setup project with Next.js and TypeScript.
+Integrate Firebase for user authentication.
+Setup MongoDB for data storage.
+Implement thread posting functionality.
+Implement commenting functionality with nested comments.
+Implement user profiles and following functionality.
+Implement notification system with webhooks.
+Implement data validation with Zod.
+Implement form management with React Hook Form.
+Implement security measures with middleware, API actions, and authorization.
+Testing and deployment.
+Risks and Mitigation:
+Risk: Data breaches due to inadequate security measures.
+Mitigation: Implement robust security measures using middleware, API actions, and authorization.
+Risk: Poor user experience due to complex interface.
+Mitigation: Use React Hook Form for efficient form management and ensure the interface is user-friendly.
+Risk: Data inconsistency due to lack of data validation.
+Mitigation: Implement data validation using Zod to ensure data integrity.
+Conclusion:
+The Treads application will provide a platform for users to post threads, comment on threads, and follow other users.
+The application will use Firebase for authentication, MongoDB for data storage, and webhooks for real-time updates. 
+The application will ensure data integrity and a streamlined user input experience.
+
+
+
+
+Authentication and Authorization TODO
+
+Install necessary packages: Firebase SDK, Firebase types for TypeScript, MongoDB driver for Node.js.
+Create a Firebase project and enable Email/Password and Google authentication methods.
+Connect your Next.js application to MongoDB.
+Create a firebaseClient.ts file to initialize Firebase with your Firebase project's configuration.
+Export functions for signing in with email/password and Google.
+Create a registration form component using React Hook Form.
+On form submission, call the Firebase sign-in function with the entered email and password.
+Handle the promise returned by the Firebase function. On success, redirect the user to the onboarding page. On failure, show an error message.
+Create an onboarding form component. This form should collect any additional information you want to store for each user.
+On form submission, save the entered data to the MongoDB user collection.
+Create a login form component.
+On form submission, call the Firebase sign-in function with the entered email and password.
+Handle the promise returned by the Firebase function. On success, redirect the user to the main page of the app. On failure, show an error message.
+Create a context for user authentication state (authContext.tsx).
+Use the AuthProvider in your _app.tsx.
+Use the AuthContext in your components to access the current user and loading state.
+Create a logout function in firebaseClient.ts that calls Firebase's sign-out function.
+Use this function in your components to log out the user.
+Implement error handling for all Firebase and MongoDB operations. Show user-friendly error messages.
+Test all authentication flows: registration, login, logout, and onboarding.
+Test error handling by triggering errors (e.g., enter an incorrect password during login).
+Deploy the application and test the authentication flows in the production environment.
