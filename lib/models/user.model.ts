@@ -20,7 +20,9 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    image: String,
+    avatar: {
+        type: String,
+    },
     bio: String,
     threads: [
         {

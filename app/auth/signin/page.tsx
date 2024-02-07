@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/config/firebaseClient";
+import { useRouter } from "next/navigation";
 
 
 const signinSchema = z.object({
@@ -16,6 +17,7 @@ const signinSchema = z.object({
 });
 
 export default function Signin() {
+  const router = useRouter()
   const form = useForm<z.infer<typeof signinSchema>>({
     resolver: zodResolver(signinSchema),
   });
@@ -23,7 +25,10 @@ export default function Signin() {
   const onSubmit = async (data: any) => {
     await signInWithEmailAndPassword(auth, data.email, data.password).then((userCredential) => {
         const user = userCredential.user
-        console.log(user)
+        if(user){
+            console.log(user)
+            router.push('/')
+        }
     }
     ).catch((error) => {
         console.log(`Error while logging in ${error}`)

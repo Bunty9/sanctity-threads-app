@@ -12,11 +12,20 @@ import firebaseApp from "@/config/firebaseClient";
 import { getAuth } from "firebase/auth";
 import { useRouter } from 'next/navigation'
 import { updateUser } from "@/lib/actions/auth.actions";
+import Image from "next/image";
+import {ChangeEvent, useState } from "react";
+import { useUploadThing } from "@/config/useUploadThing";
+// import { isBase64Image } from "@/lib/utils";
+
 
 export default function Onboarding(user:any) {
     const router = useRouter()
+    const { startUpload } = useUploadThing("imageUploader");
+    const [files, setFiles] = useState<File[]>([]);
+
     const logedInUser = getAuth(firebaseApp).currentUser;
-    if (!logedInUser) {
+    // console.log(logedInUser);
+    if (logedInUser === null) {
         //redirect to login
         router.push('/auth/signin')
     }
@@ -25,18 +34,49 @@ export default function Onboarding(user:any) {
         defaultValues: {
             email: logedInUser?.email ? logedInUser.email : "",
             userid: logedInUser?.uid ? logedInUser.uid : "",
-            avatar: user?.image ? user.image : "",
+            avatar: user?.avatar ? user.avatar : "",
             name: user?.name ? user.name : "",
             username: user?.username ? user.username : "",
             bio: user?.bio ? user.bio : "",
           },
     });
 
-    const onSubmit = (data: z.infer<typeof UserValidation>) => {
-        //handle compress and file upload for avatar here save url to firebase and mongodb 
-        //save data to corresponding user in mongodb and in firebase
-        updateUser(data);
+    const handleImage = (
+        e: ChangeEvent<HTMLInputElement>,
+        fieldChange: (value: string) => void
+      ) => {
+        e.preventDefault();
+    
+        const fileReader = new FileReader();
+    
+        if (e.target.files && e.target.files.length > 0) {
+          const file = e.target.files[0];
+          setFiles(Array.from(e.target.files));
+    
+          if (!file.type.includes("image")) return;
+    
+          fileReader.onload = async (event) => {
+            const imageDataUrl = event.target?.result?.toString() || "";
+            fieldChange(imageDataUrl);
+          };
+    
+          fileReader.readAsDataURL(file);
+        }
+      };
+
+    const onSubmit = async (data: z.infer<typeof UserValidation>) => {
+        const imgRes = await startUpload(files);
+    
+        if (imgRes && imgRes[0].url) {
+          data.avatar = imgRes[0].url;
+        }
+        
         console.log(data);
+        updateUser(data).then(() => {
+            router.push('/')
+        }).catch((error) => {
+            console.log(`Error while updating user ${error}`)
+        })
     };
 
     return (
@@ -83,7 +123,7 @@ export default function Onboarding(user:any) {
                         }}
                     />
                     {/* todo: add uploading avatar logic here */}
-                    <FormField
+                    {/* <FormField
                         control={form.control}
                         name="avatar"
                         render={({ field }) => {
@@ -95,7 +135,44 @@ export default function Onboarding(user:any) {
                                 <FormMessage />
                             </FormItem>
                         }}
-                    />
+                    /> */}
+                            <FormField
+          control={form.control}
+          name='avatar'
+          render={({ field }) => (
+            <FormItem className='flex items-center gap-4'>
+              <FormLabel className='account-form_image-label'>
+                {field.value ? (
+                  <Image
+                    src={field.value}
+                    alt='profile_icon'
+                    width={50}
+                    height={50}
+                    priority
+                    className='rounded-full object-contain'
+                  />
+                ) : (
+                  <Image
+                    src='/assets/profile.svg'
+                    alt='profile_icon'
+                    width={24}
+                    height={24}
+                    className='object-contain'
+                  />
+                )}
+              </FormLabel>
+              <FormControl className='flex-1 text-base-semibold text-gray-200'>
+                <Input
+                  type='file'
+                  accept='image/*'
+                  placeholder='Add profile photo'
+                  className='account-form_image-input'
+                  onChange={(e) => handleImage(e, field.onChange)}
+                />
+              </FormControl>
+            </FormItem>
+          )}
+        />
                     <Button type="submit">Next</Button>
                 </form>
             </Form>
