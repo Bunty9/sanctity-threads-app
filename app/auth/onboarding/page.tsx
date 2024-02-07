@@ -21,6 +21,8 @@ export default function Onboarding() {
     });
 
     const onSubmit = (data: any) => {
+        //handle compress and file upload for avatar here save url to firebase and mongodb 
+        //save data to corresponding user in mongodb and in firebase
         console.log(data);
     };
 

@@ -34,6 +34,7 @@ export default function Signup() {
     await createUserWithEmailAndPassword(auth,data.email,data.password).then((userCredential) => {
         const user = userCredential.user;
         console.log(user)
+        //create a user in mongodb with uid and email dont save password
         router.push('/auth/onboarding')
     }).catch((error) => {
         console.log(`Error while signing up ${error}`)
