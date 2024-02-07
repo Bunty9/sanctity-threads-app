@@ -6,6 +6,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "@/config/firebaseClient";
 
 
 const signinSchema = z.object({
@@ -18,8 +20,27 @@ export default function Signin() {
     resolver: zodResolver(signinSchema),
   });
 
-  const onSubmit = (data: any) => {
-    console.log(data);
+  const onSubmit = async (data: any) => {
+    await signInWithEmailAndPassword(auth, data.email, data.password).then((userCredential) => {
+        const user = userCredential.user
+        console.log(user)
+    }
+    ).catch((error) => {
+        console.log(`Error while logging in ${error}`)
+        //create a alert template to display error toast
+        switch (error.code) {
+            case 'auth/user-not-found':
+              console.log('User not found');
+              break;
+            case 'auth/wrong-password':
+              console.log('Wrong password');
+              break;
+            default:
+              console.log('Error while logging in');
+          }
+    });
+
+    // console.log(data);
   };
 
   return (

@@ -7,6 +7,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useRouter } from 'next/navigation'
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth } from "@/config/firebaseClient";
 
 const signupSchema = z.object({
   email: z.string().email(),
@@ -26,10 +28,30 @@ export default function Signup() {
     resolver: zodResolver(signupSchema),
   });
 
-  const onSubmit = (data: any) => {
+  const onSubmit = async (data: any) => {
     console.log(data);
     //route to onboarding
-    router.push('/auth/onboarding')
+    await createUserWithEmailAndPassword(auth,data.email,data.password).then((userCredential) => {
+        const user = userCredential.user;
+        console.log(user)
+        router.push('/auth/onboarding')
+    }).catch((error) => {
+        console.log(`Error while signing up ${error}`)
+        //create a alert template to display error toast
+        switch (error.code) {
+            case 'auth/email-already-in-use':
+              console.log('Email already in use');
+              break;
+            case 'auth/invalid-email':
+              console.log('Invalid email');
+              break;
+            default:
+              console.log('Error while signing up');
+          }
+
+    });
+
+    // router.push('/auth/onboarding')
   };
 
   return (
