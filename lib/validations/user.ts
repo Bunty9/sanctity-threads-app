@@ -1,8 +1,8 @@
 import * as z from "zod";
 
 export const UserValidation = z.object({
-    id: z.string(),
-    avatar: z.string().url().min(1),
+    userid: z.string(),
+    avatar: z.string().url(),
     name: z
         .string()
         .min(3, { message: "Minimum 3 characters." })

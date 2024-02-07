@@ -10,23 +10,21 @@ import { Button } from "@/components/ui/button";
 import { UserValidation } from "@/lib/validations/user";
 import firebaseApp from "@/config/firebaseClient";
 import { getAuth } from "firebase/auth";
-
-const onboardingSchema = z.object({
-    name: z.string(),
-    email: z.string(),
-    id: z.string(),
-    username: z.string(),
-    bio: z.string(),
-    avatar: z.string(),
-});
+import { useRouter } from 'next/navigation'
+import { updateUser } from "@/lib/actions/auth.actions";
 
 export default function Onboarding(user:any) {
+    const router = useRouter()
     const logedInUser = getAuth(firebaseApp).currentUser;
+    if (!logedInUser) {
+        //redirect to login
+        router.push('/auth/signin')
+    }
     const form = useForm<z.infer<typeof UserValidation>>({
         resolver: zodResolver(UserValidation),
         defaultValues: {
             email: logedInUser?.email ? logedInUser.email : "",
-            id: logedInUser?.uid ? logedInUser.uid : "",
+            userid: logedInUser?.uid ? logedInUser.uid : "",
             avatar: user?.image ? user.image : "",
             name: user?.name ? user.name : "",
             username: user?.username ? user.username : "",
@@ -37,7 +35,7 @@ export default function Onboarding(user:any) {
     const onSubmit = (data: z.infer<typeof UserValidation>) => {
         //handle compress and file upload for avatar here save url to firebase and mongodb 
         //save data to corresponding user in mongodb and in firebase
-        console.log(user)
+        updateUser(data);
         console.log(data);
     };
 

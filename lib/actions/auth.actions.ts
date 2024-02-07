@@ -1,16 +1,16 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
-
+import * as z from "zod";
+import { UserValidation } from "@/lib/validations/user";
 import User from "../models/user.model";
 
 import { connectToDB, disconnectFromDB } from "@/config/mongoose";
 
 //fetch user
-export const fetchUser = async (userId: string) => {
+export const fetchUser = async (userid: string) => {
     try {
         await connectToDB();
-        const user = await User.findById({ id: userId });
+        const user = await User.findById({ userid: userid });
         if (!user) {
             return null;
         }
@@ -24,21 +24,11 @@ export const fetchUser = async (userId: string) => {
 
 //update user
 
-interface Params {
-    userId: string;
-    username: string;
-    email: string;
-    name: string;
-    bio: string;
-    avatar: string;
-    path: string;
-}
-
-export const updateUser = async (params: Params) => {
+export const updateUser = async (params: z.infer<typeof UserValidation>) => {
     try {
         await connectToDB();
-        const user = await User.findByIdAndUpdate(
-            { id: params.userId },
+        const user = await User.findOneAndUpdate(
+            { userid: params.userid },
             {
                 username: params.username.toLowerCase(),
                 email: params.email,
@@ -47,12 +37,9 @@ export const updateUser = async (params: Params) => {
                 avatar: params.avatar,
                 onboarded: true,
             },
-            { upsert: true }
+            { upsert: true, new: true }
         );
         console.log(user);
-        if (params.path === "/profile/edit") {
-            revalidatePath(params.path);
-        }
     } catch (error: any) {
         console.log(error);
         throw new Error(`Failed to create/update user: ${error.message}`);
