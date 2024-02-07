@@ -7,22 +7,37 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { UserValidation } from "@/lib/validations/user";
+import firebaseApp from "@/config/firebaseClient";
+import { getAuth } from "firebase/auth";
 
 const onboardingSchema = z.object({
     name: z.string(),
+    email: z.string(),
+    id: z.string(),
     username: z.string(),
     bio: z.string(),
     avatar: z.string(),
 });
 
-export default function Onboarding() {
-    const form = useForm<z.infer<typeof onboardingSchema>>({
-        resolver: zodResolver(onboardingSchema),
+export default function Onboarding(user:any) {
+    const logedInUser = getAuth(firebaseApp).currentUser;
+    const form = useForm<z.infer<typeof UserValidation>>({
+        resolver: zodResolver(UserValidation),
+        defaultValues: {
+            email: logedInUser?.email ? logedInUser.email : "",
+            id: logedInUser?.uid ? logedInUser.uid : "",
+            avatar: user?.image ? user.image : "",
+            name: user?.name ? user.name : "",
+            username: user?.username ? user.username : "",
+            bio: user?.bio ? user.bio : "",
+          },
     });
 
-    const onSubmit = (data: any) => {
+    const onSubmit = (data: z.infer<typeof UserValidation>) => {
         //handle compress and file upload for avatar here save url to firebase and mongodb 
         //save data to corresponding user in mongodb and in firebase
+        console.log(user)
         console.log(data);
     };
 

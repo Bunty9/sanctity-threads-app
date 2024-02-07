@@ -31,7 +31,7 @@ export default function Signup() {
   const onSubmit = async (data: any) => {
     console.log(data);
     //route to onboarding
-    await createUserWithEmailAndPassword(auth,data.email,data.password).then((userCredential) => {
+    await createUserWithEmailAndPassword(auth,data.email,data.password).then(async (userCredential) => {
         const user = userCredential.user;
         console.log(user)
         //create a user in mongodb with uid and email dont save password
