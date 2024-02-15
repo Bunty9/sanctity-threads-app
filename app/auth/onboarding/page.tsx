@@ -70,8 +70,13 @@ export default function Onboarding(user: any) {
         if (imgRes && imgRes[0].url) {
             data.avatar = imgRes[0].url;
         }
-
-        console.log(data);
+        if (data.email === "") {
+            data.email = currentuser?.email || "";
+        }
+        if (data.userid === "") {
+            data.userid = currentuser?.uid || "";
+        }
+        // console.log(data);
         updateUser(data)
             .then(() => {
                 router.push("/");
@@ -85,7 +90,8 @@ export default function Onboarding(user: any) {
     } else if (!pending && !isSignedIn) {
         redirect("/auth/signin");
     }
-    console.log(isSignedIn, currentuser);
+    // console.log(isSignedIn, currentuser);
+    console.log(form.formState.errors );
     return (
         <main className="flex min-h-screen flex-col items-center justify-between">
             <div className="relative flex flex-col items-center justify-center min-h-screen overflow-hidden">
